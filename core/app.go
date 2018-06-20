@@ -7,7 +7,7 @@ import (
 
 // ConfigurationBuilder interface
 type ConfigurationBuilder interface {
-	ConfigRoutes()
+	ConfigRoutes(l Logger)
 }
 
 // Logger interface
@@ -71,7 +71,7 @@ func (a *App) Run() AppInterface {
 		return a
 	}
 	a.logger.LogInfo("Starting NSP app.")
-	a.configBuilder.ConfigRoutes()
+	a.configBuilder.ConfigRoutes(a.logger)
 	a.serve()
 	a.logger.LogInfo("Closing NSP app.")
 	return a

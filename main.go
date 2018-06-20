@@ -12,7 +12,7 @@ func main() {
 // Start - starts whole app
 func Start(app core.AppInterface) {
 	app.
-		DebugMode(false).
+		DebugMode(true).
 		UseLogger(config.NewConsoleLogger()).
 		UseBuilder(config.NewBasicBuilder()).
 		Run()
