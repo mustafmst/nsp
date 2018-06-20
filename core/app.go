@@ -1,9 +1,13 @@
 package core
 
-import "fmt"
+import (
+	"fmt"
+	"net/http"
+)
 
 // ConfigurationBuilder interface
 type ConfigurationBuilder interface {
+	ConfigRoutes()
 }
 
 // Logger interface
@@ -67,6 +71,7 @@ func (a *App) Run() AppInterface {
 		return a
 	}
 	a.logger.LogInfo("Starting NSP app.")
+	a.configBuilder.ConfigRoutes()
 	a.serve()
 	a.logger.LogInfo("Closing NSP app.")
 	return a
@@ -93,4 +98,5 @@ func (a *App) safeLogInfo(s string) {
 func (a *App) serve() {
 	a.logDebugInfo("serve")
 	a.logger.LogInfo("Welcome to NSP!")
+	http.ListenAndServe(":8000", nil)
 }
