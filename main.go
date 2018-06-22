@@ -14,6 +14,10 @@ func Start(app core.AppInterface) {
 	app.
 		DebugMode(true).
 		UseLogger(config.NewConsoleLogger()).
-		UseBuilder(config.NewBasicBuilder()).
+		UseBuilder(ConfigureMiddleware(config.NewBasicBuilder())).
 		Run()
+}
+
+func ConfigureMiddleware(b *config.BasicBuilder) *config.BasicBuilder {
+	return b
 }
