@@ -6,14 +6,15 @@ import (
 
 type ControllersMap interface {
 	GetControllerMethod(string, string) func(w http.ResponseWriter, r *http.Request)
+	AddController(Controller)
 }
 
 type controllersMap struct {
 	controllers map[string]Controller
 }
 
-func (cm *controllersMap) addController(name string, controller Controller) {
-	cm.controllers[name] = controller
+func (cm *controllersMap) AddController(controller Controller) {
+	cm.controllers[controller.GetName()] = controller
 }
 
 func (cm *controllersMap) getController(name string) (Controller, bool) {
@@ -36,6 +37,5 @@ func (cm *controllersMap) GetControllerMethod(controller string, method string) 
 
 func NewControllersMap() ControllersMap {
 	cm := &controllersMap{make(map[string]Controller)}
-	cm.addController(NewHomeController())
 	return cm
 }
