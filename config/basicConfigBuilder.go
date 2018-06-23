@@ -1,8 +1,9 @@
 package config
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/mustafmst/nsp/controllers"
 
 	"github.com/mustafmst/nsp/core"
 )
@@ -15,10 +16,12 @@ type BasicBuilder struct {
 
 // ConfigRoutes - configure all routes for app
 func (b *BasicBuilder) ConfigRoutes(l core.Logger) {
-	http.HandleFunc("/", b.getHandler(func(w http.ResponseWriter, r *http.Request) {
-		l.LogInfo("Get -> /")
-		json.NewEncoder(w).Encode("Hello world!")
-	}))
+	c := controllers.NewControllersMap()
+
+	http.HandleFunc(
+		b.getHandler("/", c.GetControllerMethod("home", "index"), l))
+	http.HandleFunc(
+		b.getHandler("/info", c.GetControllerMethod("home", "info"), l))
 }
 
 // UseMiddleware - enables using middleware
@@ -37,11 +40,13 @@ func NewBasicBuilder() *BasicBuilder {
 	return &BasicBuilder{false, nil}
 }
 
-func (b *BasicBuilder) getHandler(handler func(w http.ResponseWriter, r *http.Request)) func(w http.ResponseWriter, r *http.Request) {
+func (b *BasicBuilder) getHandler(route string, handler func(w http.ResponseWriter, r *http.Request), l core.Logger) (string, func(w http.ResponseWriter, r *http.Request)) {
+	// l.LogInfo("route -> " + route)
 	if b.useMiddleware == false {
-		return handler
+		return route, handler
 	}
-	return func(w http.ResponseWriter, r *http.Request) {
+	return route, func(w http.ResponseWriter, r *http.Request) {
+		l.LogDebug("aaaaaaaaaaaaaaaaaaaaaaaa")
 		handler(w, r)
 	}
 }
