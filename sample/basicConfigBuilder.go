@@ -3,9 +3,8 @@ package sample
 import (
 	"net/http"
 
-	"github.com/mustafmst/nsp/controllers"
-
 	"github.com/mustafmst/nsp"
+	"github.com/mustafmst/nsp/controllers"
 )
 
 // basicBuilder - builds app config
