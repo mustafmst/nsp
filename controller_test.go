@@ -6,26 +6,28 @@ import (
 	"testing"
 )
 
+// Mocks
 type writer struct {
-	msg []byte
+	msg string
 }
 
 func (w *writer) Header() http.Header {
 	return *new(http.Header)
 }
 func (w *writer) Write(b []byte) (int, error) {
-	w.msg = b
+	w.msg = string(b)
 	return 1, nil
 }
 func (w *writer) WriteHeader(statusCode int) {}
-
-func testMethod(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("test"))
+func getTestMethod(msg string) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		w.Write([]byte("test"))
+	}
 }
 
-var r *http.Request = new(http.Request)
-
 func Test_controller_GetMethod(t *testing.T) {
+	var r = new(http.Request)
+	// -----------------
 	type fields struct {
 		name    string
 		methods map[string]func(w http.ResponseWriter, r *http.Request)
@@ -37,16 +39,16 @@ func Test_controller_GetMethod(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want   []byte
+		want   string
 	}{
 		{"GetMethod return proper method",
-			fields{"testController", map[string]func(w http.ResponseWriter, r *http.Request){"testMethod": testMethod}},
+			fields{"testController", map[string]func(w http.ResponseWriter, r *http.Request){"testMethod": getTestMethod("test")}},
 			args{"testMethod"},
-			[]byte("test")},
+			"test"},
 		{"GetMethod return proper method",
-			fields{"testController", map[string]func(w http.ResponseWriter, r *http.Request){"otherTestMethod": testMethod}},
+			fields{"testController", map[string]func(w http.ResponseWriter, r *http.Request){"otherTestMethod": getTestMethod("test")}},
 			args{"testMethod"},
-			[]byte("There is no testMethod method in testController controller!")},
+			"There is no testMethod method in testController controller!"},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -55,7 +57,7 @@ func Test_controller_GetMethod(t *testing.T) {
 				methods: tt.fields.methods,
 			}
 			m := c.GetMethod(tt.args.name)
-			w := writer{[]byte("")}
+			w := writer{""}
 			m(&w, r)
 			if string(w.msg) != string(tt.want) {
 				t.Errorf("controller.GetMethod() returned wrong method.")
@@ -80,7 +82,7 @@ func Test_controller_AddMethod(t *testing.T) {
 	}{
 		{"Method is added to controller",
 			fields{"testController", make(map[string]func(w http.ResponseWriter, r *http.Request))},
-			args{"testMethod", testMethod}},
+			args{"testMethod", getTestMethod("")}},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

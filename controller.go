@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// Controller handles controller methods managment
 type Controller interface {
 	GetMethod(string) func(w http.ResponseWriter, r *http.Request)
 	AddMethod(string, func(w http.ResponseWriter, r *http.Request))
@@ -15,6 +16,7 @@ type controller struct {
 	methods map[string]func(w http.ResponseWriter, r *http.Request)
 }
 
+// GetMethod returns controller method for provided name
 func (c *controller) GetMethod(name string) func(w http.ResponseWriter, r *http.Request) {
 	m, ok := c.methods[name]
 	if ok {
@@ -25,14 +27,17 @@ func (c *controller) GetMethod(name string) func(w http.ResponseWriter, r *http.
 	}
 }
 
+// AddMethod registers function as a controller method
 func (c *controller) AddMethod(name string, method func(w http.ResponseWriter, r *http.Request)) {
 	c.methods[name] = method
 }
 
+// GetName reurns controller name
 func (c *controller) GetName() string {
 	return c.name
 }
 
+// NewController creates new empty controller with name
 func NewController(name string) Controller {
 	return &controller{name, make(map[string]func(w http.ResponseWriter, r *http.Request))}
 }
