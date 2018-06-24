@@ -1,4 +1,4 @@
-package controllers
+package nsp
 
 import (
 	"net/http"
