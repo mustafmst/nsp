@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// Path interface
 type Path interface {
 	GetPath() string
 	GetHandler() http.Handler
@@ -29,14 +30,15 @@ func (p *path) Method(method string) {
 	}
 }
 
-func NewPath(pathUrl string, handlerFunction func(http.ResponseWriter, *http.Request)) Path {
-	return &path{pathUrl, handlerFunc{handlerFunction}, "GET"}
+// NewPath returns new path
+func NewPath(pathURL string, handlerFunction func(http.ResponseWriter, *http.Request)) Path {
+	return &path{pathURL, &handlerFunc{handlerFunction}, "GET"}
 }
 
 type handlerFunc struct {
 	function func(http.ResponseWriter, *http.Request)
 }
 
-func (h handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+func (h *handlerFunc) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	h.function(w, r)
 }

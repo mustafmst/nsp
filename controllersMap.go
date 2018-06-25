@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+// ControllersMap provides interface for controllers managment
 type ControllersMap interface {
 	GetControllerMethod(string, string) func(w http.ResponseWriter, r *http.Request)
 	AddController(Controller)
@@ -35,6 +36,7 @@ func (cm *controllersMap) GetControllerMethod(controller string, method string) 
 	}
 }
 
+// NewControllersMap creates new empty controllers map
 func NewControllersMap() ControllersMap {
 	cm := &controllersMap{make(map[string]Controller)}
 	return cm
