@@ -1,9 +1,8 @@
 package nsp
 
-// ConfigurationBuilder interface
-type ConfigurationBuilder interface {
-	ConfigRoutes(l Logger)
-}
+import (
+	"net/http"
+)
 
 // Logger interface
 type Logger interface {
@@ -15,7 +14,7 @@ type Logger interface {
 // AppInterface - main application interface
 type AppInterface interface {
 	DebugMode(option bool) AppInterface
-	UseBuilder(b ConfigurationBuilder) AppInterface
+	UseRouter(router http.Handler) AppInterface
 	UseLogger(l Logger) AppInterface
 	Run() AppInterface
 }

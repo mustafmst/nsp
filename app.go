@@ -7,9 +7,9 @@ import (
 
 // App main class for NSP app
 type App struct {
-	configBuilder ConfigurationBuilder
-	logger        Logger
-	debugEnabled  bool
+	router       http.Handler
+	logger       Logger
+	debugEnabled bool
 }
 
 // NewApp - function creating new App instance
@@ -24,9 +24,9 @@ func (a *App) DebugMode(option bool) AppInterface {
 }
 
 // UseBuilder - provides configuration builder for app
-func (a *App) UseBuilder(b ConfigurationBuilder) AppInterface {
+func (a *App) UseRouter(router http.Handler) AppInterface {
 	a.logDebugInfo("UseBuilder")
-	a.configBuilder = b
+	a.router = router
 	a.safeLogInfo("Added ConfigurationBuilder")
 	return a
 }
@@ -46,12 +46,11 @@ func (a *App) Run() AppInterface {
 		fmt.Println("No Logger provided! - ending app")
 		return a
 	}
-	if a.configBuilder == nil {
-		a.logger.LogError("No ConfigurationBuilder provided!")
+	if a.router == nil {
+		a.logger.LogError("No Router provided!")
 		return a
 	}
 	a.logger.LogInfo("Starting NSP app.")
-	a.configBuilder.ConfigRoutes(a.logger)
 	a.serve()
 	a.logger.LogInfo("Closing NSP app.")
 	return a
@@ -78,5 +77,5 @@ func (a *App) safeLogInfo(s string) {
 func (a *App) serve() {
 	a.logDebugInfo("serve")
 	a.logger.LogInfo("Welcome to NSP!")
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":8000", a.router)
 }

@@ -8,24 +8,22 @@ import (
 // Router interface
 type Router interface {
 	ServeHTTP(w http.ResponseWriter, r *http.Request)
-	HandleFunc(string, func(http.ResponseWriter, *http.Request)) Path
+	AddPath(string) PathNode
 }
 
 type basicRouter struct {
-	paths []Path
+	paths PathNode
 }
 
 // NewRouter returns new empty router instance
 func NewRouter() Router {
-	return &basicRouter{make([]Path, 0)}
+	return &basicRouter{NewPathNode()}
 }
 
 func (rt *basicRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	fmt.Println(r)
 }
 
-func (rt *basicRouter) HandleFunc(path string, f func(http.ResponseWriter, *http.Request)) Path {
-	p := NewPath(path, f)
-	rt.paths = append(rt.paths, p)
-	return p
+func (rt *basicRouter) AddPath(path string) PathNode {
+	return rt.paths.AddPath(path)
 }
