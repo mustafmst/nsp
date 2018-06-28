@@ -5,26 +5,34 @@ import (
 	"net/http"
 )
 
-// App main class for NSP app
-type App struct {
+// App - main application interface
+type App interface {
+	DebugMode(option bool) App
+	UseRouter(router http.Handler) App
+	UseLogger(l Logger) App
+	Run() App
+}
+
+// app main class for NSP app
+type app struct {
 	router       http.Handler
 	logger       Logger
 	debugEnabled bool
 }
 
 // NewApp - function creating new App instance
-func NewApp() *App {
-	return new(App)
+func NewApp() App {
+	return new(app)
 }
 
 // DebugMode - toggle debug mode in app
-func (a *App) DebugMode(option bool) AppInterface {
+func (a *app) DebugMode(option bool) App {
 	a.debugEnabled = option
 	return a
 }
 
-// UseBuilder - provides configuration builder for app
-func (a *App) UseRouter(router http.Handler) AppInterface {
+// UseRouter - provides app router
+func (a *app) UseRouter(router http.Handler) App {
 	a.logDebugInfo("UseBuilder")
 	a.router = router
 	a.safeLogInfo("Added ConfigurationBuilder")
@@ -32,7 +40,7 @@ func (a *App) UseRouter(router http.Handler) AppInterface {
 }
 
 // UseLogger - provides logger for app
-func (a *App) UseLogger(l Logger) AppInterface {
+func (a *app) UseLogger(l Logger) App {
 	a.logDebugInfo("UseLogger")
 	a.logger = l
 	a.safeLogInfo("Added Logger")
@@ -40,7 +48,7 @@ func (a *App) UseLogger(l Logger) AppInterface {
 }
 
 // Run - initiates NSP app
-func (a *App) Run() AppInterface {
+func (a *app) Run() App {
 	a.logDebugInfo("Run")
 	if a.logger == nil {
 		fmt.Println("No Logger provided! - ending app")
@@ -56,7 +64,7 @@ func (a *App) Run() AppInterface {
 	return a
 }
 
-func (a *App) logDebugInfo(funcName string) {
+func (a *app) logDebugInfo(funcName string) {
 	if a.debugEnabled {
 		if a.logger == nil {
 			fmt.Println("--->", funcName)
@@ -66,7 +74,7 @@ func (a *App) logDebugInfo(funcName string) {
 	}
 }
 
-func (a *App) safeLogInfo(s string) {
+func (a *app) safeLogInfo(s string) {
 	if a.logger != nil {
 		a.logger.LogInfo(s)
 	} else {
@@ -74,7 +82,7 @@ func (a *App) safeLogInfo(s string) {
 	}
 }
 
-func (a *App) serve() {
+func (a *app) serve() {
 	a.logDebugInfo("serve")
 	a.logger.LogInfo("Welcome to NSP!")
 	http.ListenAndServe(":8000", a.router)

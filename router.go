@@ -1,7 +1,6 @@
 package nsp
 
 import (
-	"fmt"
 	"net/http"
 )
 
@@ -21,7 +20,7 @@ func NewRouter() Router {
 }
 
 func (rt *basicRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	fmt.Println(r)
+	rt.paths.ServeHTTP(w, r)
 }
 
 func (rt *basicRouter) AddPath(path string) PathNode {

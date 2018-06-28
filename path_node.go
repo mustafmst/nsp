@@ -5,6 +5,7 @@ import (
 	"strings"
 )
 
+// PathNode holds tree representation of api paths
 type PathNode interface {
 	AddMethod(string, func(http.ResponseWriter, *http.Request)) PathNode
 	addPath([]string) PathNode
@@ -37,6 +38,7 @@ func (p *pathNode) AddMethod(method string, handler func(http.ResponseWriter, *h
 }
 
 func (p *pathNode) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	// TODO: get proper node for request path
 	if m, ok := p.methods[r.Method]; ok {
 		m.ServeHTTP(w, r)
 	}
@@ -58,6 +60,7 @@ func (p *pathNode) AddPath(path string) PathNode {
 	return p.addPath(strings.Split(path, "/"))
 }
 
+// NewPathNode return new empty PathNode
 func NewPathNode() PathNode {
 	return &pathNode{make(map[string]PathNode), make(map[string]http.Handler)}
 }
